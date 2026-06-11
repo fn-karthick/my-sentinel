@@ -324,17 +324,45 @@ function authOnStateChanged(callback) {
 function setupFirebaseListeners() {
     // 1. Listen for nodes data changes
     const nodesRef = fbDatabase.ref('nodes');
-    nodesRef.on('value', (snapshot) => {
-        const val = snapshot.val();
-        if (val) {
-            // Update our local state with values from Firebase
-            localDbState.nodes = val;
-            triggerDbChangeEvents();
-        } else {
-            // If database is empty on Firebase, seed it with our localDbState
-            fbDatabase.ref('nodes').set(localDbState.nodes);
+   nodesRef.on('value', (snapshot) => {
+    const val = snapshot.val();
+
+    if (!val) return;
+
+    Object.keys(val).forEach(nodeId => {
+
+        // Convert history object → array
+        if (
+            val[nodeId].history &&
+            !Array.isArray(val[nodeId].history)
+        ) {
+            val[nodeId].history = Object.values(val[nodeId].history);
+        }
+
+        // Convert recent pest detections object → array
+        if (
+            val[nodeId].pestData &&
+            val[nodeId].pestData.recent &&
+            !Array.isArray(val[nodeId].pestData.recent)
+        ) {
+            val[nodeId].pestData.recent =
+                Object.values(val[nodeId].pestData.recent);
+        }
+
+        // Convert confidenceTrend object → array
+        if (
+            val[nodeId].pestData &&
+            val[nodeId].pestData.confidenceTrend &&
+            !Array.isArray(val[nodeId].pestData.confidenceTrend)
+        ) {
+            val[nodeId].pestData.confidenceTrend =
+                Object.values(val[nodeId].pestData.confidenceTrend);
         }
     });
+
+    localDbState.nodes = val;
+    triggerDbChangeEvents();
+});
 }
 
 // Subscribe to database changes
@@ -388,7 +416,7 @@ function updateNodeTelemetry(nodeId, updatedSensors) {
     };
 
     // Update historical telemetry array (keeping max 30 items)
-    node.history.push({
+    if (!Array.isArray(node.history)) {     node.history = Object.values(node.history || {}); }  node.history.push({
         temperature: node.sensorData.temperature,
         humidity: node.sensorData.humidity,
         mq7: node.sensorData.mq7,
