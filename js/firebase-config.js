@@ -10,10 +10,11 @@ const firebaseConfig = {
 };
 // Check if Firebase credentials have been configured by the user
 function isFirebaseConfigured() {
-  return firebaseConfig.apiKey &&
-    firebaseConfig.apiKey.trim() !== "" &&
-    !firebaseConfig.apiKey.includes("AIzaSyCvUhJcB20lwo3qvOFM0lAopwRVNOMWVX4") &&
-    firebaseConfig.databaseURL &&
-    firebaseConfig.databaseURL.trim() !== "" &&
-    !firebaseConfig.databaseURL.includes("https://my-sentinel-5e573-default-rtdb.asia-southeast1.firebasedatabase.app");
+    return (
+        typeof firebaseConfig !== "undefined" &&
+        firebaseConfig.apiKey &&
+        firebaseConfig.apiKey.trim() !== "" &&
+        firebaseConfig.databaseURL &&
+        firebaseConfig.databaseURL.trim() !== ""
+    );
 }
