@@ -416,7 +416,10 @@ function updateNodeTelemetry(nodeId, updatedSensors) {
     };
 
     // Update historical telemetry array (keeping max 30 items)
-    if (!Array.isArray(node.history)) {     node.history = Object.values(node.history || {}); }  node.history.push({
+    if (!Array.isArray(node.history)) {     
+        node.history = Object.values(node.history || {}); 
+    }
+    node.history.push({
         temperature: node.sensorData.temperature,
         humidity: node.sensorData.humidity,
         mq7: node.sensorData.mq7,
