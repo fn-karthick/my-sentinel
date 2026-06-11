@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel Dashboard - Multi-Node IoT Environmental Monitoring</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Background grid & canvas animations -->
+    <div class="cyber-background"></div>
+    <div class="grid-overlay"></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Demo Mode / Firebase Status Notification Toast -->
+    <div id="status-toast" class="status-toast hidden">
+        <i class="fas fa-info-circle text-cyan"></i>
+        <span id="toast-message">Running in Local Demo Mode</span>
+        <button onclick="closeToast()">&times;</button>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <main id="app-container">
+        
+        <!-- 1. LOGIN SCREEN -->
+        <section id="login-view" class="app-view active">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-glow">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <h1>SENTINEL</h1>
+                    <p class="subtitle">MULTI-NODE IoT CONTROL ROOM</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" id="email" required placeholder="name@sentinel.io" autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="login-btn" class="glow-btn">
+                            <span>INITIALIZE SESSION</span>
+                            <span class="btn-loader hidden"><i class="fas fa-spinner fa-spin"></i></span>
+                        </button>
+                    </div>
+                    <div id="login-error" class="error-message hidden">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span id="error-text">Authentication Failed</span>
+                    </div>
+                </form>
+                <div class="login-footer">
+                    <p>Secured Connection Protocol v4.2</p>
+                    <p class="demo-tip">Or click here to <a href="#" id="bypass-login">Bypass with Demo Access</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. NODE NETWORK TOPOLOGY VIEW -->
+        <section id="network-topology-view" class="app-view">
+            <div class="topology-header">
+                <div class="header-main">
+                    <h2><span class="text-cyan">SENTINEL</span> SYSTEM MAP</h2>
+                    <p>Select a node to inspect telemetric streams</p>
+                </div>
+                <div class="header-actions">
+                    <span class="connection-pill demo-badge hidden" id="topology-demo-badge">DEMO MODE ACTIVE</span>
+                    <button class="glass-btn btn-logout" id="logout-btn-topology"><i class="fas fa-power-off"></i> DISCONNECT</button>
+                </div>
+            </div>
+
+            <!-- Interconnection Canvas/SVG -->
+            <div class="network-map-container">
+                <svg class="network-svg" viewBox="0 0 1000 700">
+                    <defs>
+                        <linearGradient id="cyan-glow-line" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.2"/>
+                            <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.2"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Connection lines between central hub and nodes -->
+                    <path class="network-path path-node1" d="M 500,350 L 500,140" />
+                    <path class="network-path path-node2" d="M 500,350 L 180,350" />
+                    <path class="network-path path-node3" d="M 500,350 L 820,350" />
+                    <path class="network-path path-node4" d="M 500,350 L 500,560" />
+                </svg>
+
+                <!-- Central Hub -->
+                <div class="central-hub">
+                    <div class="hub-radar"></div>
+                    <div class="hub-core">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>CENTRAL CORE</span>
+                    </div>
+                </div>
+
+                <!-- Node 1 (Agri Zone) - TOP -->
+                <div class="node-card-wrapper node1-pos" onclick="openNodeDashboard('node1')">
+                    <div class="node-card" id="node1-card">
+                        <div class="node-glow-effect"></div>
+                        <div class="node-header">
+                            <span class="node-id">NODE_01</span>
+                            <span class="status-indicator online">
+                                <span class="status-pulse"></span>
+                                <span class="status-text">ONLINE</span>
+                            </span>
+                        </div>
+                        <h3>Thirumangalam</h3>
+                        <div class="node-metrics">
+                            <div class="node-metric">
+                                <span class="m-label">TEMP</span>
+                                <span class="m-val" id="node1-temp">--°C</span>
+                            </div>
+                            <div class="node-metric">
+                                <span class="m-label">HUMI</span>
+                                <span class="m-val" id="node1-humi">--%</span>
+                            </div>
+                        </div>
+                        <div class="node-footer">
+                            <span class="signal-strength"><i class="fas fa-wifi"></i> 94%</span>
+                            <span class="inspect-link">INSPECT <i class="fas fa-angle-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node 2 (Industrial) - LEFT -->
+                <div class="node-card-wrapper node2-pos" onclick="openNodeDashboard('node2')">
+                    <div class="node-card" id="node2-card">
+                        <div class="node-glow-effect"></div>
+                        <div class="node-header">
+                            <span class="node-id">NODE_02</span>
+                            <span class="status-indicator online">
+                                <span class="status-pulse"></span>
+                                <span class="status-text">ONLINE</span>
+                            </span>
+                        </div>
+                        <h3>Anna Nagar Tower</h3>
+                        <div class="node-metrics">
+                            <div class="node-metric">
+                                <span class="m-label">TEMP</span>
+                                <span class="m-val" id="node2-temp">--°C</span>
+                            </div>
+                            <div class="node-metric">
+                                <span class="m-label">HUMI</span>
+                                <span class="m-val" id="node2-humi">--%</span>
+                            </div>
+                        </div>
+                        <div class="node-footer">
+                            <span class="signal-strength"><i class="fas fa-wifi"></i> 89%</span>
+                            <span class="inspect-link">INSPECT <i class="fas fa-angle-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node 3 (Greenhouse) - RIGHT -->
+                <div class="node-card-wrapper node3-pos" onclick="openNodeDashboard('node3')">
+                    <div class="node-card" id="node3-card">
+                        <div class="node-glow-effect"></div>
+                        <div class="node-header">
+                            <span class="node-id">NODE_03</span>
+                            <span class="status-indicator online">
+                                <span class="status-pulse"></span>
+                                <span class="status-text">ONLINE</span>
+                            </span>
+                        </div>
+                        <h3>Anna Nagar East</h3>
+                        <div class="node-metrics">
+                            <div class="node-metric">
+                                <span class="m-label">TEMP</span>
+                                <span class="m-val" id="node3-temp">--°C</span>
+                            </div>
+                            <div class="node-metric">
+                                <span class="m-label">HUMI</span>
+                                <span class="m-val" id="node3-humi">--%</span>
+                            </div>
+                        </div>
+                        <div class="node-footer">
+                            <span class="signal-strength"><i class="fas fa-wifi"></i> 91%</span>
+                            <span class="inspect-link">INSPECT <i class="fas fa-angle-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node 4 (Warehouse) - BOTTOM -->
+                <div class="node-card-wrapper node4-pos" onclick="openNodeDashboard('node4')">
+                    <div class="node-card" id="node4-card">
+                        <div class="node-glow-effect"></div>
+                        <div class="node-header">
+                            <span class="node-id">NODE_04</span>
+                            <span class="status-indicator online">
+                                <span class="status-pulse"></span>
+                                <span class="status-text">ONLINE</span>
+                            </span>
+                        </div>
+                        <h3>Shenoy Nagar</h3>
+                        <div class="node-metrics">
+                            <div class="node-metric">
+                                <span class="m-label">TEMP</span>
+                                <span class="m-val" id="node4-temp">--°C</span>
+                            </div>
+                            <div class="node-metric">
+                                <span class="m-label">HUMI</span>
+                                <span class="m-val" id="node4-humi">--%</span>
+                            </div>
+                        </div>
+                        <div class="node-footer">
+                            <span class="signal-strength"><i class="fas fa-wifi"></i> 97%</span>
+                            <span class="inspect-link">INSPECT <i class="fas fa-angle-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. NODE-SPECIFIC SENTINEL DASHBOARD -->
+        <section id="dashboard-view" class="app-view">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-branding" onclick="backToTopology()">
+                    <i class="fas fa-shield-halved text-cyan logo-nav"></i>
+                    <div class="topbar-titles">
+                        <h2>SENTINEL DASHBOARD</h2>
+                        <div class="live-data-badge">
+                            <span class="live-pulse"></span>
+                            <span class="badge-text">LIVE DATA</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="topbar-center">
+                    <div class="node-selector-container">
+                        <label for="node-selector"><i class="fas fa-satellite"></i> NODE:</label>
+                        <select id="node-selector" class="glass-select">
+                            <option value="node1">01 – Thirumangalam</option>
+                            <option value="node2">02 – Anna Nagar Tower</option>
+                            <option value="node3">03 – Anna Nagar East</option>
+                            <option value="node4">04 – Shenoy Nagar</option>
+                        </select>
+                        <button id="rename-node-btn" class="glass-btn" title="Rename Node" style="padding: 2px 6px; border: none; background: transparent; color: var(--cyan); margin-left: 5px; cursor: pointer; transition: transform 0.2s;"><i class="fas fa-pen-to-square"></i></button>
+                    </div>
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="status-indicator online header-status">
+                        <span class="status-pulse"></span>
+                        <span class="status-text">ONLINE</span>
+                    </div>
+                    <button class="glass-btn btn-nav" onclick="backToTopology()"><i class="fas fa-network-wired"></i> MAP</button>
+                    <button class="glass-btn btn-logout" id="logout-btn-dashboard"><i class="fas fa-power-off"></i> LOGOUT</button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- ROW 1: 5 SUMMARY CARDS -->
+                <div class="summary-grid">
+                    <!-- Card 1: Temperature -->
+                    <div class="summary-card" id="card-temp">
+                        <div class="card-glow"></div>
+                        <div class="card-icon text-cyan"><i class="fas fa-thermometer-half"></i></div>
+                        <div class="card-info">
+                            <span class="card-label">TEMPERATURE</span>
+                            <h3 class="card-value font-mono" id="val-temp">--.-°C</h3>
+                        </div>
+                        <div class="card-sparkline">
+                            <canvas id="spark-temp" width="100" height="40"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Humidity -->
+                    <div class="summary-card" id="card-humi">
+                        <div class="card-glow"></div>
+                        <div class="card-icon text-cyan"><i class="fas fa-tint"></i></div>
+                        <div class="card-info">
+                            <span class="card-label">HUMIDITY</span>
+                            <h3 class="card-value font-mono" id="val-humi">--.-%</h3>
+                        </div>
+                        <div class="card-sparkline">
+                            <canvas id="spark-humi" width="100" height="40"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Gas Status -->
+                    <div class="summary-card" id="card-gas">
+                        <div class="card-glow"></div>
+                        <div class="card-icon" id="icon-gas"><i class="fas fa-wind"></i></div>
+                        <div class="card-info">
+                            <span class="card-label">GAS STATUS</span>
+                            <h3 class="card-value status-badge" id="val-gas">OPTIMAL</h3>
+                        </div>
+                        <div class="card-status-bar">
+                            <div class="status-fill" id="fill-gas" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Anomaly Detection -->
+                    <div class="summary-card" id="card-anomaly">
+                        <div class="card-glow"></div>
+                        <div class="card-icon" id="icon-anomaly"><i class="fas fa-triangle-exclamation"></i></div>
+                        <div class="card-info">
+                            <span class="card-label">ANOMALY STATUS</span>
+                            <h3 class="card-value status-badge" id="val-anomaly">SECURE</h3>
+                        </div>
+                        <div class="card-status-bar">
+                            <div class="status-fill" id="fill-anomaly" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Last Update Time -->
+                    <div class="summary-card" id="card-sync">
+                        <div class="card-glow"></div>
+                        <div class="card-icon text-cyan"><i class="fas fa-clock"></i></div>
+                        <div class="card-info">
+                            <span class="card-label">TELEMETRY SYNC</span>
+                            <h3 class="card-value font-mono" id="val-sync">--:--:--</h3>
+                        </div>
+                        <div class="card-badge" id="sync-counter">0s ago</div>
+                    </div>
+                </div>
+
+                <!-- ROW 2: MAIN DASHBOARD LAYOUT (CHARTS + PEST INTEL) -->
+                <div class="dashboard-grid">
+                    <!-- Left Column: Charts -->
+                    <section class="telemetry-charts-section">
+                        <!-- Chart 1: Temperature Over Time -->
+                        <div class="glass-panel chart-panel">
+                            <div class="panel-header">
+                                <h3><i class="fas fa-chart-line text-cyan"></i> TEMPERATURE STREAM (&deg;C)</h3>
+                                <span class="chart-legend"><i class="fas fa-circle text-cyan"></i> Thermal Index</span>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-temp-history"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row: MQ7 & MQ135 side by side -->
+                        <div class="charts-subgrid">
+                            <div class="glass-panel chart-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-wave-square text-purple"></i> CARBON MONOXIDE (MQ7)</h3>
+                                    <span class="chart-legend"><i class="fas fa-circle text-purple"></i> CO ppm</span>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="chart-mq7-history"></canvas>
+                                </div>
+                            </div>
+                            <div class="glass-panel chart-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-fan text-green"></i> AIR QUALITY INDEX (MQ135)</h3>
+                                    <span class="chart-legend"><i class="fas fa-circle text-green"></i> NH3 / VOCs</span>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="chart-mq135-history"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Right Column: Pest Intelligence -->
+                    <section class="pest-intel-section">
+                        <!-- Latest Detection Card -->
+                        <div class="glass-panel pest-card-glow latest-pest-card">
+                            <div class="panel-header">
+                                <h3><i class="fas fa-eye text-cyan"></i> LATEST PEST DETECTION</h3>
+                                <div class="pest-alert-light" id="pest-alert-dot"></div>
+                            </div>
+                            <div class="pest-alert-info">
+                                <div class="pest-icon-badge">
+                                    <i class="fas fa-bug"></i>
+                                </div>
+                                <div class="pest-details">
+                                    <h2 id="latest-pest-name">No Detection</h2>
+                                    <div class="detail-row">
+                                        <span class="d-lbl">Confidence:</span>
+                                        <span class="d-val text-cyan font-mono" id="latest-pest-conf">--%</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="d-lbl">Detected:</span>
+                                        <span class="d-val font-mono" id="latest-pest-time">--/--/---- --:--:--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pest Summary Card -->
+                        <div class="glass-panel pest-summary-card">
+                            <div class="panel-header">
+                                <h3><i class="fas fa-chart-pie text-cyan"></i> INTEL SUMMARY</h3>
+                            </div>
+                            <div class="pest-summary-metrics">
+                                <div class="pest-metric-row">
+                                    <span class="sm-label">TOTAL DETECTIONS</span>
+                                    <span class="sm-value text-cyan font-mono" id="pest-total-detections">0</span>
+                                </div>
+                                <hr class="cyber-divider">
+                                <div class="pest-metric-row">
+                                    <span class="sm-label">MOST DETECTED PEST</span>
+                                    <span class="sm-value text-cyan" id="pest-most-detected">N/A</span>
+                                </div>
+                                <hr class="cyber-divider">
+                                <div class="pest-metric-row">
+                                    <span class="sm-label">AVG CONFIDENCE</span>
+                                    <span class="sm-value text-cyan font-mono" id="pest-avg-confidence">0%</span>
+                                </div>
+                            </div>
+                            <div class="pest-btn-container">
+                                <button class="glow-btn full-btn" id="open-pest-details-btn">
+                                    <span>VIEW PEST DETAILS</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 4. FLOATING PEST DETAILS MODAL (GLASSMORPHISM) -->
+    <div id="pest-modal" class="modal-overlay hidden">
+        <div class="modal-card glass-panel">
+            <header class="modal-header">
+                <h2><i class="fas fa-microscope text-cyan"></i> PEST INTELLIGENCE DIAGNOSTIC</h2>
+                <button class="modal-close-btn" id="close-pest-details-btn">&times;</button>
+            </header>
+            <div class="modal-body">
+                <!-- Left: Table -->
+                <div class="modal-left-column">
+                    <h3><i class="fas fa-list-ul text-cyan"></i> RECENT DETECTIONS LOG</h3>
+                    <div class="table-container">
+                        <table class="cyber-table" id="recent-pest-table">
+                            <thead>
+                                <tr>
+                                    <th>Pest Name</th>
+                                    <th>Confidence</th>
+                                    <th>Detection Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Inserted dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: Charts -->
+                <div class="modal-right-column">
+                    <div class="modal-chart-box">
+                        <h3><i class="fas fa-chart-bar text-cyan"></i> INSECT SPECIES FREQUENCY</h3>
+                        <div class="modal-chart-wrapper">
+                            <canvas id="chart-pest-frequency"></canvas>
+                        </div>
+                    </div>
+                    <div class="modal-chart-box">
+                        <h3><i class="fas fa-chart-line text-cyan"></i> CONFIDENCE ACCURACY TREND (%)</h3>
+                        <div class="modal-chart-wrapper">
+                            <canvas id="chart-pest-confidence"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RETRACTABLE CONTROL PANEL (MOCK IoT SIMULATOR) -->
+    <div id="sim-control-panel" class="sim-panel collapsed">
+        <div class="sim-toggle-btn" id="sim-panel-toggle">
+            <i class="fas fa-sliders"></i>
+            <span>SIMULATOR</span>
+        </div>
+        <div class="sim-panel-content">
+            <h3><i class="fas fa-tools"></i> IoT Telemetry Injector</h3>
+            <p class="sim-info">Modify values below to instantly update the active node's live data.</p>
+            
+            <div class="sim-control-group">
+                <label>Active Node: <span class="text-cyan font-mono" id="sim-active-node-name">node1</span></label>
+            </div>
+            
+            <div class="sim-control-group">
+                <label for="sim-temp">Temp: <span class="val-display" id="sim-val-temp">24.5°C</span></label>
+                <input type="range" id="sim-temp" min="10" max="45" step="0.5" value="24.5">
+            </div>
+
+            <div class="sim-control-group">
+                <label for="sim-humi">Humidity: <span class="val-display" id="sim-val-humi">65%</span></label>
+                <input type="range" id="sim-humi" min="10" max="95" step="1" value="65">
+            </div>
+
+            <div class="sim-control-group">
+                <label for="sim-mq7">MQ7 (CO): <span class="val-display" id="sim-val-mq7">12 ppm</span></label>
+                <input type="range" id="sim-mq7" min="0" max="100" step="1" value="12">
+            </div>
+
+            <div class="sim-control-group">
+                <label for="sim-mq135">MQ135 (Air): <span class="val-display" id="sim-val-mq135">85 ppm</span></label>
+                <input type="range" id="sim-mq135" min="0" max="300" step="5" value="85">
+            </div>
+
+            <div class="sim-btn-row">
+                <button class="sim-action-btn btn-danger" id="sim-trigger-anomaly">Inject Anomaly</button>
+                <button class="sim-action-btn btn-success" id="sim-clear-anomaly">Resolve</button>
+            </div>
+
+            <div class="sim-btn-row">
+                <button class="sim-action-btn btn-warning" id="sim-trigger-pest">Trigger Pest Detection</button>
+            </div>
+
+            <div class="sim-footer">
+                <label class="switch-container">
+                    <input type="checkbox" id="sim-auto-ticks" checked>
+                    <span class="slider-switch"></span>
+                    <span>Auto-Simulation Loop (3s)</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDKs (Compat library version to allow running offline / file:// protocol seamlessly) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <!-- Project Application Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-db.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+{
+  "nodes": {
+    "node1": {
+      "areaName": "Agriculture Zone",
+      "status": "online",
+      "sensorData": {
+        "temperature": 30.0,
+        "humidity": 49.0,
+        "mq7": 0.0,
+        "mq135": 149.0,
+        "anomaly": "No Anomaly",
+        "gasStatus": "OPTIMAL",
+        "timestamp": 1781004205000
+      },
+      "history": {
+        "item_0": {
+          "temperature": 30.0,
+          "humidity": 49.0,
+          "mq7": 0.0,
+          "mq135": 149.0,
+          "timestamp": 1781004122000
+        },
+        "item_1": {
+          "temperature": 30.1,
+          "humidity": 48.0,
+          "mq7": 0.0,
+          "mq135": 138.0,
+          "timestamp": 1781004205000
+        }
+      },
+      "pestData": {
+        "latest": {
+          "pestName": "Brown Planthopper",
+          "confidence": 85.6,
+          "timestamp": 1781004205000
+        },
+        "summary": {
+          "totalDetections": 142,
+          "mostDetected": "Brown Planthopper",
+          "avgConfidence": 82.4
+        },
+        "recent": {
+          "item_0": { "pestName": "Brown Planthopper", "confidence": 85.6, "timestamp": 1781004205000 },
+          "item_1": { "pestName": "Aphid", "confidence": 78.2, "timestamp": 1781004122000 },
+          "item_2": { "pestName": "Leaf Miner", "confidence": 81.5, "timestamp": 1781004039000 }
+        },
+        "frequency": {
+          "Brown Planthopper": 45,
+          "Aphid": 30,
+          "Leaf Miner": 25,
+          "Whitefly": 22,
+          "Thrips": 20
+        },
+        "confidenceTrend": {
+          "item_0": { "confidence": 81.2, "timestamp": 1781004039000 },
+          "item_1": { "confidence": 78.2, "timestamp": 1781004122000 },
+          "item_2": { "confidence": 85.6, "timestamp": 1781004205000 }
+        }
+      }
+    },
+    "node2": {
+      "areaName": "Industrial Sector",
+      "status": "online",
+      "sensorData": {
+        "temperature": 28.1,
+        "humidity": 55.4,
+        "mq7": 42.1,
+        "mq135": 145.8,
+        "anomaly": "No Anomaly",
+        "gasStatus": "OPTIMAL",
+        "timestamp": 1781004205000
+      },
+      "history": {
+        "item_0": {
+          "temperature": 27.5,
+          "humidity": 56.0,
+          "mq7": 41.5,
+          "mq135": 142.1,
+          "timestamp": 1781004122000
+        },
+        "item_1": {
+          "temperature": 28.1,
+          "humidity": 55.4,
+          "mq7": 42.1,
+          "mq135": 145.8,
+          "timestamp": 1781004205000
+        }
+      },
+      "pestData": {
+        "latest": {
+          "pestName": "Thrips",
+          "confidence": 76.5,
+          "timestamp": 1781004205000
+        },
+        "summary": {
+          "totalDetections": 68,
+          "mostDetected": "Thrips",
+          "avgConfidence": 78.9
+        },
+        "recent": {
+          "item_0": { "pestName": "Thrips", "confidence": 76.5, "timestamp": 1781004205000 },
+          "item_1": { "pestName": "Whitefly", "confidence": 82.1, "timestamp": 1781004122000 }
+        },
+        "frequency": {
+          "Brown Planthopper": 10,
+          "Aphid": 15,
+          "Leaf Miner": 8,
+          "Whitefly": 13,
+          "Thrips": 22
+        },
+        "confidenceTrend": {
+          "item_0": { "confidence": 82.1, "timestamp": 1781004122000 },
+          "item_1": { "confidence": 76.5, "timestamp": 1781004205000 }
+        }
+      }
+    },
+    "node3": {
+      "areaName": "Greenhouse Facility",
+      "status": "online",
+      "sensorData": {
+        "temperature": 26.2,
+        "humidity": 78.5,
+        "mq7": 8.5,
+        "mq135": 65.2,
+        "anomaly": "No Anomaly",
+        "gasStatus": "OPTIMAL",
+        "timestamp": 1781004205000
+      },
+      "history": {
+        "item_0": {
+          "temperature": 25.8,
+          "humidity": 79.1,
+          "mq7": 8.1,
+          "mq135": 63.8,
+          "timestamp": 1781004122000
+        },
+        "item_1": {
+          "temperature": 26.2,
+          "humidity": 78.5,
+          "mq7": 8.5,
+          "mq135": 65.2,
+          "timestamp": 1781004205000
+        }
+      },
+      "pestData": {
+        "latest": {
+          "pestName": "Aphid",
+          "confidence": 91.2,
+          "timestamp": 1781004205000
+        },
+        "summary": {
+          "totalDetections": 215,
+          "mostDetected": "Aphid",
+          "avgConfidence": 85.1
+        },
+        "recent": {
+          "item_0": { "pestName": "Aphid", "confidence": 91.2, "timestamp": 1781004205000 },
+          "item_1": { "pestName": "Brown Planthopper", "confidence": 84.4, "timestamp": 1781004122000 }
+        },
+        "frequency": {
+          "Brown Planthopper": 52,
+          "Aphid": 78,
+          "Leaf Miner": 34,
+          "Whitefly": 41,
+          "Thrips": 10
+        },
+        "confidenceTrend": {
+          "item_0": { "confidence": 84.4, "timestamp": 1781004122000 },
+          "item_1": { "confidence": 91.2, "timestamp": 1781004205000 }
+        }
+      }
+    },
+    "node4": {
+      "areaName": "Warehouse Vault",
+      "status": "online",
+      "sensorData": {
+        "temperature": 20.8,
+        "humidity": 48.1,
+        "mq7": 15.2,
+        "mq135": 110.5,
+        "anomaly": "No Anomaly",
+        "gasStatus": "OPTIMAL",
+        "timestamp": 1781004205000
+      },
+      "history": {
+        "item_0": {
+          "temperature": 21.2,
+          "humidity": 47.5,
+          "mq7": 15.0,
+          "mq135": 108.2,
+          "timestamp": 1781004122000
+        },
+        "item_1": {
+          "temperature": 20.8,
+          "humidity": 48.1,
+          "mq7": 15.2,
+          "mq135": 110.5,
+          "timestamp": 1781004205000
+        }
+      },
+      "pestData": {
+        "latest": {
+          "pestName": "Leaf Miner",
+          "confidence": 83.2,
+          "timestamp": 1781004205000
+        },
+        "summary": {
+          "totalDetections": 32,
+          "mostDetected": "Leaf Miner",
+          "avgConfidence": 81.3
+        },
+        "recent": {
+          "item_0": { "pestName": "Leaf Miner", "confidence": 83.2, "timestamp": 1781004205000 },
+          "item_1": { "pestName": "Thrips", "confidence": 79.4, "timestamp": 1781004122000 }
+        },
+        "frequency": {
+          "Brown Planthopper": 5,
+          "Aphid": 6,
+          "Leaf Miner": 14,
+          "Whitefly": 3,
+          "Thrips": 4
+        },
+        "confidenceTrend": {
+          "item_0": { "confidence": 79.4, "timestamp": 1781004122000 },
+          "item_1": { "confidence": 83.2, "timestamp": 1781004205000 }
+        }
+      }
+    }
+  }
+}
