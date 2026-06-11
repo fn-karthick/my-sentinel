@@ -279,5 +279,6 @@ function syncSlidersToActiveNode(nodeId) {
 // Initialise Simulator Script
 window.addEventListener("DOMContentLoaded", () => {
     setupSimulatorUiListeners();
-    startSimulator();
+
+    // startSimulator(); // Disabled for Firebase testing
 });
