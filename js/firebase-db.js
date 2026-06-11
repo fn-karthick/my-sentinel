@@ -322,47 +322,61 @@ function authOnStateChanged(callback) {
 
 // Real Firebase listeners setup
 function setupFirebaseListeners() {
-    // 1. Listen for nodes data changes
     const nodesRef = fbDatabase.ref('nodes');
-   nodesRef.on('value', (snapshot) => {
-    const val = snapshot.val();
 
-    if (!val) return;
+    nodesRef.on('value', (snapshot) => {
+        const val = snapshot.val();
 
-    Object.keys(val).forEach(nodeId => {
+        if (!val) return;
 
-        // Convert history object → array
-        if (
-            val[nodeId].history &&
-            !Array.isArray(val[nodeId].history)
-        ) {
-            val[nodeId].history = Object.values(val[nodeId].history);
-        }
+        Object.keys(val).forEach(nodeId => {
 
-        // Convert recent pest detections object → array
-        if (
-            val[nodeId].pestData &&
-            val[nodeId].pestData.recent &&
-            !Array.isArray(val[nodeId].pestData.recent)
-        ) {
-            val[nodeId].pestData.recent =
-                Object.values(val[nodeId].pestData.recent);
-        }
+            // HISTORY
+            if (!val[nodeId].history) {
+                val[nodeId].history = [];
+            } else if (!Array.isArray(val[nodeId].history)) {
+                val[nodeId].history = Object.values(val[nodeId].history);
+            }
 
-        // Convert confidenceTrend object → array
-        if (
-            val[nodeId].pestData &&
-            val[nodeId].pestData.confidenceTrend &&
-            !Array.isArray(val[nodeId].pestData.confidenceTrend)
-        ) {
-            val[nodeId].pestData.confidenceTrend =
-                Object.values(val[nodeId].pestData.confidenceTrend);
-        }
+            // PEST DATA
+            if (!val[nodeId].pestData) {
+                val[nodeId].pestData = {
+                    latest: {},
+                    summary: {},
+                    recent: [],
+                    frequency: {},
+                    confidenceTrend: []
+                };
+            }
+
+            // RECENT DETECTIONS
+            if (!val[nodeId].pestData.recent) {
+                val[nodeId].pestData.recent = [];
+            } else if (!Array.isArray(val[nodeId].pestData.recent)) {
+                val[nodeId].pestData.recent =
+                    Object.values(val[nodeId].pestData.recent);
+            }
+
+            // CONFIDENCE TREND
+            if (!val[nodeId].pestData.confidenceTrend) {
+                val[nodeId].pestData.confidenceTrend = [];
+            } else if (!Array.isArray(val[nodeId].pestData.confidenceTrend)) {
+                val[nodeId].pestData.confidenceTrend =
+                    Object.values(val[nodeId].pestData.confidenceTrend);
+            }
+
+            // FREQUENCY
+            if (!val[nodeId].pestData.frequency) {
+                val[nodeId].pestData.frequency = {};
+            }
+        });
+
+        localDbState.nodes = val;
+
+        console.log("Firebase Data Loaded:", localDbState.nodes);
+
+        triggerDbChangeEvents();
     });
-
-    localDbState.nodes = val;
-    triggerDbChangeEvents();
-});
 }
 
 // Subscribe to database changes
@@ -406,19 +420,22 @@ function triggerDbChangeEvents() {
 function updateNodeTelemetry(nodeId, updatedSensors) {
     const timestamp = Date.now();
     const node = localDbState.nodes[nodeId];
+
     if (!node) return;
 
-    // Set sensors
     node.sensorData = {
         ...node.sensorData,
         ...updatedSensors,
         timestamp: timestamp
     };
 
-    // Update historical telemetry array (keeping max 30 items)
-    if (!Array.isArray(node.history)) {     
-        node.history = Object.values(node.history || {}); 
+    // Force history into array
+    if (!node.history) {
+        node.history = [];
+    } else if (!Array.isArray(node.history)) {
+        node.history = Object.values(node.history);
     }
+
     node.history.push({
         temperature: node.sensorData.temperature,
         humidity: node.sensorData.humidity,
@@ -432,7 +449,6 @@ function updateNodeTelemetry(nodeId, updatedSensors) {
     }
 
     if (!isDemoMode) {
-        // Sync to Firebase DB
         fbDatabase.ref(`nodes/${nodeId}/sensorData`).set(node.sensorData);
         fbDatabase.ref(`nodes/${nodeId}/history`).set(node.history);
     } else {
